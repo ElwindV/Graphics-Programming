@@ -3,13 +3,40 @@
 public class Chunk : MonoBehaviour
 {
     [HideInInspector]
-    public byte[,,] blocks = new byte[16,32,16];
+    public byte[,,] blocks = new byte[16, 32, 16];
+
+    public int ChunkWidth
+    {
+        get {
+            return blocks.GetLength(0);
+        }
+    }
+
+    public int ChunkHeight {
+        get {
+            return blocks.GetLength(1);
+        }
+    }
+
+    public int ChunkDepth
+    {
+        get
+        {
+            return blocks.GetLength(2);
+        }
+    }
 
     [HideInInspector]
     public int seed = 4113;
 
     [HideInInspector]
     public float factor = .07f;
+
+    [HideInInspector]
+    public int x;
+
+    [HideInInspector]
+    public int z;
 
     void Start()
     {
@@ -36,6 +63,13 @@ public class Chunk : MonoBehaviour
                     else {
                         blocks[x, y, z] = (byte)Blocks.Air;
                     }
+
+                    //Vector2 blocksCoordinate = new Vector2(transform.position.x + x * 1f, transform.position.y + y * 1f);
+                    //Vector2 holeCoordinate = new Vector2(10f, 5f);
+                    //if (Vector2.Distance(blocksCoordinate, holeCoordinate) < 3f)
+                    //{
+                    //    blocks[x, y, z] = (byte)Blocks.Air;
+                    //}
                 }
             }
         }

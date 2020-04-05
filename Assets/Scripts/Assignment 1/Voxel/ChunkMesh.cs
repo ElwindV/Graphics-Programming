@@ -7,6 +7,9 @@ public class ChunkMesh : MonoBehaviour
     protected Mesh mesh;
     protected MeshRenderer meshRenderer;
 
+    [HideInInspector] 
+    public VoxelHandler voxelHandler;
+
     protected Chunk chunk;
     protected Material material;
 
@@ -14,6 +17,11 @@ public class ChunkMesh : MonoBehaviour
     protected List<int> triangleList;
     protected List<Vector3> normalList;
     protected List<Vector2> uvList;
+
+    protected Chunk leftChunk;
+    protected Chunk rightChunk;
+    protected Chunk frontChunk;
+    protected Chunk backChunk;
 
     void Start()
     {
@@ -24,6 +32,11 @@ public class ChunkMesh : MonoBehaviour
 
         material = Resources.Load<Material>("Materials/Voxel");
         meshRenderer.material = this.material;
+
+        leftChunk   = (chunk.x - 1 >= 0) ? voxelHandler.chunks[chunk.x - 1, chunk.z].GetComponent<Chunk>() : null;
+        rightChunk  = (chunk.x + 1 < voxelHandler.chunks.GetLength(0)) ? voxelHandler.chunks[chunk.x + 1, chunk.z].GetComponent<Chunk>() : null;
+        backChunk = (chunk.z + 1 < voxelHandler.chunks.GetLength(1)) ? voxelHandler.chunks[chunk.x, chunk.z + 1].GetComponent<Chunk>() : null;
+        frontChunk = (chunk.z - 1 >= 0) ? voxelHandler.chunks[chunk.x, chunk.z - 1].GetComponent<Chunk>() : null;
 
         Refresh();
     }
@@ -48,14 +61,18 @@ public class ChunkMesh : MonoBehaviour
                         continue;
                     }
 
-                    byte rightBlock = ((x + 1 != chunk.blocks.GetLength(0)) ? chunk.blocks[x + 1, y, z] : (byte)Blocks.Air);
-                    byte leftBlock = ((x - 1 >= 0) ? chunk.blocks[x - 1, y, z] : (byte)Blocks.Air);
+                    byte rightBlock = ((x + 1 < chunk.blocks.GetLength(0)) ? chunk.blocks[x + 1, y, z] 
+                        : ((rightChunk != null) ? rightChunk.blocks[0,y,z] : (byte)Blocks.Air));
+                    byte leftBlock = ((x - 1 >= 0) ? chunk.blocks[x - 1, y, z]
+                        : ((leftChunk != null) ? leftChunk.blocks[leftChunk.ChunkWidth - 1, y, z] : (byte)Blocks.Air));
 
-                    byte topBlock       = ((y + 1 != chunk.blocks.GetLength(1)) ? chunk.blocks[x, y + 1, z] : (byte)Blocks.Air);
-                    byte bottomBlock    = ((y - 1 >= 0) ? chunk.blocks[x, y - 1, z] : (byte) Blocks.Air);
+                    byte topBlock = ((y + 1 < chunk.blocks.GetLength(1)) ? chunk.blocks[x, y + 1, z] : (byte)Blocks.Air);
+                    byte bottomBlock = ((y - 1 >= 0) ? chunk.blocks[x, y - 1, z] : (byte) Blocks.Air);
 
-                    byte backBlock      = ((z + 1 != chunk.blocks.GetLength(2)) ? chunk.blocks[x, y, z + 1] : (byte)Blocks.Air);
-                    byte frontBlock     = ((z - 1 >= 0) ? chunk.blocks[x, y, z - 1] : (byte)Blocks.Air);
+                    byte backBlock = ((z + 1 < chunk.blocks.GetLength(2)) ? chunk.blocks[x, y, z + 1]
+                        : ((backChunk != null) ? backChunk.blocks[x,y,0] : (byte)Blocks.Air));
+                    byte frontBlock = ((z - 1 >= 0) ? chunk.blocks[x, y, z - 1]
+                        : ((frontChunk != null) ? frontChunk.blocks[x, y, frontChunk.ChunkDepth - 1] : (byte)Blocks.Air));
 
                     HandleRight(ref block, ref rightBlock, ref currentPosition);
                     HandleLeft(ref block, ref leftBlock, ref currentPosition);
