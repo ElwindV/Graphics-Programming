@@ -38,16 +38,24 @@ public class Chunk : MonoBehaviour
     [HideInInspector]
     public int z;
 
-    void Start()
+    public void Start()
     {
-        for (int x = 0; x < 16; x++) {
-            for (int z = 0; z < 16; z++) {
+        Generate();
+    }
+
+    public void Generate() 
+    {
+        for (int x = 0; x < 16; x++)
+        {
+            for (int z = 0; z < 16; z++)
+            {
                 float xComponent = seed + ((transform.position.x + (x * 1f)) * factor);
                 float yComponent = seed + ((transform.position.z + (z * 1f)) * factor);
                 float noiseFactor = Mathf.PerlinNoise(xComponent, yComponent);
                 int stoneLayer = (int)(10f + noiseFactor * 10f);
 
-                for (int y = 0; y < 32; y++) {
+                for (int y = 0; y < 32; y++)
+                {
                     if (y < stoneLayer)
                     {
                         blocks[x, y, z] = (byte)Blocks.Stone;
@@ -60,20 +68,29 @@ public class Chunk : MonoBehaviour
                     {
                         blocks[x, y, z] = (byte)Blocks.Grass;
                     }
-                    else {
+                    else
+                    {
                         blocks[x, y, z] = (byte)Blocks.Air;
                     }
-
-                    //Vector2 blocksCoordinate = new Vector2(transform.position.x + x * 1f, transform.position.y + y * 1f);
-                    //Vector2 holeCoordinate = new Vector2(10f, 5f);
-                    //if (Vector2.Distance(blocksCoordinate, holeCoordinate) < 3f)
-                    //{
-                    //    blocks[x, y, z] = (byte)Blocks.Air;
-                    //}
                 }
             }
         }
     }
 
-
+    public void DestroyRadius(Vector3 point, float magnitude)
+    {
+        for (int x = 0; x < 16; x++)
+        {
+            for (int z = 0; z < 16; z++)
+            {
+                for (int y = 0; y < 32; y++)
+                {
+                    Vector3 blockPosition = new Vector3(x * 1f, y * 1f, z * 1f) + transform.position;
+                    if (Vector3.Distance(point, blockPosition) < magnitude) {
+                        blocks[x, y, z] = (byte)Blocks.Air;
+                    }
+                }
+            }
+        }
+    }
 }

@@ -6,6 +6,7 @@ public class ChunkMesh : MonoBehaviour
     protected MeshFilter meshFilter;
     protected Mesh mesh;
     protected MeshRenderer meshRenderer;
+    protected MeshCollider meshCollider;
 
     [HideInInspector] 
     public VoxelHandler voxelHandler;
@@ -27,6 +28,7 @@ public class ChunkMesh : MonoBehaviour
     {
         meshFilter = this.gameObject.AddComponent<MeshFilter>();
         meshRenderer = this.gameObject.AddComponent<MeshRenderer>();
+        meshCollider = this.gameObject.AddComponent<MeshCollider>();
 
         chunk = this.gameObject.GetComponent<Chunk>();
 
@@ -89,6 +91,7 @@ public class ChunkMesh : MonoBehaviour
         mesh.triangles = triangleList.ToArray();
         mesh.normals = normalList.ToArray();
         mesh.uv = uvList.ToArray();
+        meshCollider.sharedMesh = mesh;
     }
 
     protected void AddFaceNormals(Vector3 direction) {
