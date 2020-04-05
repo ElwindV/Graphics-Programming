@@ -93,10 +93,38 @@ public class ChunkMesh : MonoBehaviour
 
     protected void AddUVs(byte block, Sides side) 
     {
-        uvList.Add(0.5f * Vector2.zero);
-        uvList.Add(0.5f * Vector2.right);
-        uvList.Add(0.5f * Vector2.up);
-        uvList.Add(0.5f * Vector2.right + 0.5f * Vector2.up);
+        Vector2 textureStart;
+
+        switch (block) {
+            case (byte) Blocks.Stone:
+                textureStart = new Vector2(0f, 0f);
+                break;
+            case (byte) Blocks.Dirt:
+                textureStart = new Vector2(0f, .5f);
+                break;
+            case (byte) Blocks.Grass:
+                if (side == Sides.Left || side == Sides.Right || side == Sides.Front || side == Sides.Back)
+                {
+                    textureStart = new Vector2(.5f, 0f);
+                }
+                else if (side == Sides.Top)
+                {
+                    textureStart = new Vector2(.5f, .5f);
+                }
+                else {
+                    textureStart = new Vector2(0f, .5f);
+                }
+                break;
+            default:
+                textureStart = new Vector2(0f, 0f);
+                break;
+
+        }
+
+        uvList.Add(textureStart + 0.5f * Vector2.zero);
+        uvList.Add(textureStart + 0.5f * Vector2.right);
+        uvList.Add(textureStart + 0.5f * Vector2.up);
+        uvList.Add(textureStart + 0.5f * Vector2.right + 0.5f * Vector2.up);
     }
 
     protected void HandleRight(ref byte block, ref byte rightBlock, ref Vector3 currentPosition) 
