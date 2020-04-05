@@ -57,12 +57,12 @@ public class ChunkMesh : MonoBehaviour
                     byte backBlock      = ((z + 1 != chunk.blocks.GetLength(2)) ? chunk.blocks[x, y, z + 1] : (byte)Blocks.Air);
                     byte frontBlock     = ((z - 1 >= 0) ? chunk.blocks[x, y, z - 1] : (byte)Blocks.Air);
 
-                    handleRight(ref block, ref rightBlock, ref currentPosition);
-                    handleLeft(ref block, ref leftBlock, ref currentPosition);
-                    handleTop(ref block, ref topBlock, ref currentPosition);
-                    handleBottom(ref block, ref bottomBlock, ref currentPosition);
-                    handleBack(ref block, ref backBlock, ref currentPosition);
-                    handleFront(ref block, ref frontBlock, ref currentPosition);
+                    HandleRight(ref block, ref rightBlock, ref currentPosition);
+                    HandleLeft(ref block, ref leftBlock, ref currentPosition);
+                    HandleTop(ref block, ref topBlock, ref currentPosition);
+                    HandleBottom(ref block, ref bottomBlock, ref currentPosition);
+                    HandleBack(ref block, ref backBlock, ref currentPosition);
+                    HandleFront(ref block, ref frontBlock, ref currentPosition);
                 }
             }
         }
@@ -74,7 +74,28 @@ public class ChunkMesh : MonoBehaviour
         mesh.uv = uvList.ToArray();
     }
 
-    protected void handleRight(ref byte block, ref byte rightBlock, ref Vector3 currentPosition) 
+    protected void AddFaceNormals(Vector3 direction) {
+        for (short i = 0; i < 4; i++) {
+            normalList.Add(direction);
+        }
+    }
+
+    protected void AddTriangles(int baseVertexNumber) 
+    {
+        triangleList.Add(baseVertexNumber + 0);
+        triangleList.Add(baseVertexNumber + 3);
+        triangleList.Add(baseVertexNumber + 1);
+
+        triangleList.Add(baseVertexNumber + 0);
+        triangleList.Add(baseVertexNumber + 2);
+        triangleList.Add(baseVertexNumber + 3);
+    }
+
+    protected void AddUVs(byte block, int side) 
+    { 
+    }
+
+    protected void HandleRight(ref byte block, ref byte rightBlock, ref Vector3 currentPosition) 
     {
         if (rightBlock != (byte)Blocks.Air) {
             return;
@@ -86,18 +107,8 @@ public class ChunkMesh : MonoBehaviour
         vertexList.Add(currentPosition + Vector3.right + Vector3.up);                       // + 2
         vertexList.Add(currentPosition + Vector3.right + Vector3.forward + Vector3.up);     // + 3
 
-        normalList.Add(Vector3.right);
-        normalList.Add(Vector3.right);
-        normalList.Add(Vector3.right);
-        normalList.Add(Vector3.right);
-
-        triangleList.Add(size + 0);
-        triangleList.Add(size + 3);
-        triangleList.Add(size + 1);
-
-        triangleList.Add(size + 0);
-        triangleList.Add(size + 2);
-        triangleList.Add(size + 3);
+        AddFaceNormals(Vector3.right);
+        AddTriangles(size);
 
         uvList.Add(0.5f * Vector2.zero);
         uvList.Add(0.5f * Vector2.right);
@@ -105,7 +116,7 @@ public class ChunkMesh : MonoBehaviour
         uvList.Add(0.5f * Vector2.right + 0.5f * Vector2.up);
     }
 
-    protected void handleLeft(ref byte block, ref byte leftBlock, ref Vector3 currentPosition) 
+    protected void HandleLeft(ref byte block, ref byte leftBlock, ref Vector3 currentPosition) 
     {
         if (leftBlock != (byte)Blocks.Air)
         {
@@ -118,18 +129,8 @@ public class ChunkMesh : MonoBehaviour
         vertexList.Add(currentPosition + Vector3.forward + Vector3.up);     // + 2
         vertexList.Add(currentPosition + Vector3.up);                       // + 3
 
-        normalList.Add(Vector3.left);
-        normalList.Add(Vector3.left);
-        normalList.Add(Vector3.left);
-        normalList.Add(Vector3.left);
-
-        triangleList.Add(size + 0);
-        triangleList.Add(size + 3);
-        triangleList.Add(size + 1);
-
-        triangleList.Add(size + 0);
-        triangleList.Add(size + 2);
-        triangleList.Add(size + 3);
+        AddFaceNormals(Vector3.left);
+        AddTriangles(size);
 
         uvList.Add(0.5f * Vector2.zero);
         uvList.Add(0.5f * Vector2.right);
@@ -137,7 +138,7 @@ public class ChunkMesh : MonoBehaviour
         uvList.Add(0.5f * Vector2.right + 0.5f * Vector2.up);
     }
 
-    protected void handleTop(ref byte block, ref byte topBlock, ref Vector3 currentPosition) 
+    protected void HandleTop(ref byte block, ref byte topBlock, ref Vector3 currentPosition) 
     {
         if (topBlock != (byte)Blocks.Air)
         {
@@ -150,18 +151,8 @@ public class ChunkMesh : MonoBehaviour
         vertexList.Add(currentPosition + Vector3.up + Vector3.forward);                  // + 2
         vertexList.Add(currentPosition + Vector3.up + Vector3.right + Vector3.forward);  // + 3
 
-        normalList.Add(Vector3.up);
-        normalList.Add(Vector3.up);
-        normalList.Add(Vector3.up);
-        normalList.Add(Vector3.up);
-
-        triangleList.Add(size + 0);
-        triangleList.Add(size + 3);
-        triangleList.Add(size + 1);
-
-        triangleList.Add(size + 0);
-        triangleList.Add(size + 2);
-        triangleList.Add(size + 3);
+        AddFaceNormals(Vector3.up);
+        AddTriangles(size);
 
         uvList.Add(0.5f * Vector2.zero);
         uvList.Add(0.5f * Vector2.right);
@@ -169,7 +160,7 @@ public class ChunkMesh : MonoBehaviour
         uvList.Add(0.5f * Vector2.right + 0.5f * Vector2.up);
     }
 
-    protected void handleBottom(ref byte block, ref byte bottomBlock, ref Vector3 currentPosition) 
+    protected void HandleBottom(ref byte block, ref byte bottomBlock, ref Vector3 currentPosition) 
     {
         if (bottomBlock != (byte)Blocks.Air)
         {
@@ -177,23 +168,13 @@ public class ChunkMesh : MonoBehaviour
         }
 
         int size = vertexList.Count;
-        vertexList.Add(currentPosition);                                    // + 0
-        vertexList.Add(currentPosition + Vector3.right);                    // + 1
-        vertexList.Add(currentPosition + Vector3.forward);                  // + 2
-        vertexList.Add(currentPosition + Vector3.right + Vector3.forward);  // + 3
+        vertexList.Add(currentPosition + Vector3.right);                    // + 0
+        vertexList.Add(currentPosition);                                    // + 1
+        vertexList.Add(currentPosition + Vector3.right + Vector3.forward);  // + 2
+        vertexList.Add(currentPosition + Vector3.forward);                  // + 3
 
-        normalList.Add(Vector3.down);
-        normalList.Add(Vector3.down);
-        normalList.Add(Vector3.down);
-        normalList.Add(Vector3.down);
-
-        triangleList.Add(size + 0);
-        triangleList.Add(size + 1);
-        triangleList.Add(size + 3);
-
-        triangleList.Add(size + 0);
-        triangleList.Add(size + 3);
-        triangleList.Add(size + 2);
+        AddFaceNormals(Vector3.down);
+        AddTriangles(size);
 
         uvList.Add(0.5f * Vector2.zero);
         uvList.Add(0.5f * Vector2.right);
@@ -202,7 +183,7 @@ public class ChunkMesh : MonoBehaviour
 
     }
 
-    protected void handleBack(ref byte block, ref byte backBlock, ref Vector3 currentPosition) 
+    protected void HandleBack(ref byte block, ref byte backBlock, ref Vector3 currentPosition) 
     {
         if (backBlock != (byte)Blocks.Air)
         {
@@ -215,18 +196,8 @@ public class ChunkMesh : MonoBehaviour
         vertexList.Add(currentPosition + Vector3.forward + Vector3.right + Vector3.up);      // + 2
         vertexList.Add(currentPosition + Vector3.forward + Vector3.up);                      // + 3
 
-        normalList.Add(Vector3.forward);
-        normalList.Add(Vector3.forward);
-        normalList.Add(Vector3.forward);
-        normalList.Add(Vector3.forward);
-
-        triangleList.Add(size + 0);
-        triangleList.Add(size + 3);
-        triangleList.Add(size + 1);
-
-        triangleList.Add(size + 0);
-        triangleList.Add(size + 2);
-        triangleList.Add(size + 3);
+        AddFaceNormals(Vector3.forward);
+        AddTriangles(size);
 
         uvList.Add(0.5f * Vector2.zero);
         uvList.Add(0.5f * Vector2.right);
@@ -234,7 +205,7 @@ public class ChunkMesh : MonoBehaviour
         uvList.Add(0.5f * Vector2.right + 0.5f * Vector2.up);
     }
 
-    protected void handleFront(ref byte block, ref byte frontBlock, ref Vector3 currentPosition) 
+    protected void HandleFront(ref byte block, ref byte frontBlock, ref Vector3 currentPosition) 
     {
         if (frontBlock != (byte)Blocks.Air)
         {
@@ -247,18 +218,8 @@ public class ChunkMesh : MonoBehaviour
         vertexList.Add(currentPosition + Vector3.up);                    // + 2
         vertexList.Add(currentPosition + Vector3.right + Vector3.up);    // + 3
 
-        normalList.Add(Vector3.back);
-        normalList.Add(Vector3.back);
-        normalList.Add(Vector3.back);
-        normalList.Add(Vector3.back);
-
-        triangleList.Add(size + 0);
-        triangleList.Add(size + 3);
-        triangleList.Add(size + 1);
-
-        triangleList.Add(size + 0);
-        triangleList.Add(size + 2);
-        triangleList.Add(size + 3);
+        AddFaceNormals(Vector3.back);
+        AddTriangles(size);
 
         uvList.Add(0.5f * Vector2.zero);
         uvList.Add(0.5f * Vector2.right);
