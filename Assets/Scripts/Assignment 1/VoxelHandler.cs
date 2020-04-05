@@ -2,10 +2,10 @@
 
 public class VoxelHandler : MonoBehaviour
 {
-    public int xChunkCount = 1;
-    public int zChunkCount = 1;
+    public int xChunkCount;
+    public int zChunkCount;
 
-    protected GameObject[,] chunks = new GameObject[5,5];
+    protected GameObject[,] chunks = new GameObject[0,0];
 
     public void Start()
     {
