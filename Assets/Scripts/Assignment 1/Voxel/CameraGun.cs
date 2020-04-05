@@ -49,11 +49,5 @@ public class CameraGun : MonoBehaviour
                 chunk.GetComponent<ChunkMesh>().Refresh();
             }
         }
-        //GameObject chunkObject = hit.transform.gameObject;
-        //Chunk chunk = chunkObject.GetComponent<Chunk>();
-        //ChunkMesh chunkMesh = chunkObject.GetComponent<ChunkMesh>();
-
-        //chunk.DestroyRadius(hit.point, 5f);
-        //chunkMesh.Refresh();
     }
 }
