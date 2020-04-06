@@ -69,11 +69,6 @@ public class ProceduralMesh : MonoBehaviour
         }
 
         uv = new Vector2[vertices.Length];
-        //for (int x = 0; x < sides; x++) {
-        //    for (int y = 0; y < layers; y++) {
-        //        uv[(x * sides) + y] = new Vector2(x,);
-        //    }
-        //}
         for (int i = 0; i < sides * layers; i++)
         {
             float x = ((i % sides) * 1f) / (sides * 1f);
