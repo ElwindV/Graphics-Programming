@@ -42,9 +42,14 @@ public class CameraGun : MonoBehaviour
         {
             for (int z = Mathf.Max(zExplosionChunk - chunkOverlap, 0); z <= zExplosionChunk + chunkOverlap && z < zChunkCount; z++)
             {
-                GameObject chunk = voxelHandler.chunks[x, z];
-                chunk.GetComponent<Chunk>().DestroyRadius(hit.point, explosionSize);
-                chunk.GetComponent<ChunkMesh>().Refresh();
+                voxelHandler.chunks[x, z].GetComponent<Chunk>().DestroyRadius(hit.point, explosionSize);
+            }
+        }
+        for (int x = Mathf.Max(xExplosionChunk - chunkOverlap, 0); x <= xExplosionChunk + chunkOverlap && x < xChunkCount; x++)
+        {
+            for (int z = Mathf.Max(zExplosionChunk - chunkOverlap, 0); z <= zExplosionChunk + chunkOverlap && z < zChunkCount; z++)
+            {
+                voxelHandler.chunks[x, z].GetComponent<ChunkMesh>().Refresh();
             }
         }
     }
