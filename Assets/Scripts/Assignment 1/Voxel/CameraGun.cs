@@ -4,23 +4,21 @@ using UnityEngine;
 
 public class CameraGun : MonoBehaviour
 {
-    [HideInInspector]
     public new Camera camera;
 
     public VoxelHandler voxelHandler;
 
     public float explosionSize = 5f;
 
-    public void Start()
-    {
-        camera = Camera.main;
-    }
-
 
     public void Update()
     {
         if (Input.GetMouseButtonDown(0)) {
             Mine();
+        }
+        if (Input.GetMouseButtonDown(1))
+        {
+            Refresh();
         }
     }
 
@@ -49,5 +47,18 @@ public class CameraGun : MonoBehaviour
                 chunk.GetComponent<ChunkMesh>().Refresh();
             }
         }
+    }
+
+    protected void Refresh() 
+    {
+        RaycastHit hit;
+        Ray ray = camera.ScreenPointToRay(Input.mousePosition);
+        if (!Physics.Raycast(ray, out hit, 100f))
+        {
+            return;
+        }
+
+        GameObject chunk = hit.transform.gameObject;
+        chunk.GetComponent<ChunkMesh>().Refresh();
     }
 }
