@@ -54,10 +54,9 @@ public class Chunk : MonoBehaviour
                 float noiseFactor = Mathf.PerlinNoise(xComponent, yComponent);
                 int stoneLayer = (int)(10f + noiseFactor * 10f);
 
-
                 for (int y = 0; y < 32; y++)
                 {
-                    if (y == 0) 
+                    if (y == 0)
                     {
                         blocks[x, y, z] = (byte)Blocks.Bedrock;
                     }
@@ -66,14 +65,14 @@ public class Chunk : MonoBehaviour
                         blocks[x, y, z] = (byte)Blocks.Stone;
                     }
                     else if (y < stoneLayer + 3)
-                    { 
-                        blocks[x, y, z] = (byte) Blocks.Dirt;
+                    {
+                        blocks[x, y, z] = (byte)Blocks.Dirt;
                     }
                     else if (y < stoneLayer + 4)
                     {
-                        blocks[x, y, z] = (byte) Blocks.Grass;
+                        blocks[x, y, z] = (byte)Blocks.Grass;
                     }
-                    else
+                    else 
                     {
                         blocks[x, y, z] = (byte)Blocks.Air;
                     }

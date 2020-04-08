@@ -138,8 +138,11 @@ public class ChunkMesh : MonoBehaviour
             case (byte)Blocks.Bedrock:
                 textureStart = Atlas.uvs["bedrock"];
                 break;
-            case (byte)Blocks.Sand:
-                textureStart = Atlas.uvs["sand"];
+            case (byte)Blocks.Log:
+                textureStart = (side == Sides.Left || side == Sides.Right || side == Sides.Front || side == Sides.Back) ? Atlas.uvs["log-side"] : Atlas.uvs["log-top"];
+                break;
+            case (byte)Blocks.Leaf:
+                textureStart = Atlas.uvs["leaf"];
                 break;
             default:
                 textureStart = Atlas.uvs["stone"];

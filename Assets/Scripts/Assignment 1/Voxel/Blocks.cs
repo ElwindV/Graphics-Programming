@@ -6,5 +6,6 @@ public enum Blocks
     Dirt    = 2,
     Grass   = 3,
     Bedrock = 4,
-    Sand    = 5,
+    Log     = 5,
+    Leaf    = 6,
 }
