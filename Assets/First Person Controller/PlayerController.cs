@@ -39,6 +39,8 @@ public class PlayerController : MonoBehaviour
 
     void Start()
     {
+        m_CharacterController = m_CharacterController ?? null;
+        m_Camera = m_Camera ?? Camera.main;
         Cursor.lockState = CursorLockMode.Locked;
     }
 

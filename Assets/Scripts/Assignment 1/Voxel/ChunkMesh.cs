@@ -117,34 +117,41 @@ public class ChunkMesh : MonoBehaviour
 
         switch (block) {
             case (byte) Blocks.Stone:
-                textureStart = new Vector2(0f, 0f);
+                textureStart = Atlas.uvs["stone"];
                 break;
             case (byte) Blocks.Dirt:
-                textureStart = new Vector2(0f, .5f);
+                textureStart = Atlas.uvs["dirt"];
                 break;
             case (byte) Blocks.Grass:
                 if (side == Sides.Left || side == Sides.Right || side == Sides.Front || side == Sides.Back)
                 {
-                    textureStart = new Vector2(.5f, 0f);
+                    textureStart = Atlas.uvs["grass-side"];
                 }
                 else if (side == Sides.Top)
                 {
-                    textureStart = new Vector2(.5f, .5f);
+                    textureStart = Atlas.uvs["grass-top"];
                 }
                 else {
-                    textureStart = new Vector2(0f, .5f);
+                    textureStart = Atlas.uvs["dirt"];
                 }
                 break;
+            case (byte)Blocks.Bedrock:
+                textureStart = Atlas.uvs["bedrock"];
+                break;
+            case (byte)Blocks.Sand:
+                textureStart = Atlas.uvs["sand"];
+                break;
             default:
-                textureStart = new Vector2(0f, 0f);
+                textureStart = Atlas.uvs["stone"];
                 break;
 
         }
 
-        uvList.Add(textureStart + 0.5f * Vector2.zero);
-        uvList.Add(textureStart + 0.5f * Vector2.right);
-        uvList.Add(textureStart + 0.5f * Vector2.up);
-        uvList.Add(textureStart + 0.5f * Vector2.right + 0.5f * Vector2.up);
+        float divider = 1f / (Atlas.dimensions);
+        uvList.Add(textureStart + divider * Vector2.zero);
+        uvList.Add(textureStart + divider * Vector2.right);
+        uvList.Add(textureStart + divider * Vector2.up);
+        uvList.Add(textureStart + divider * Vector2.right + divider * Vector2.up);
     }
 
     protected void HandleRight(ref byte block, ref byte rightBlock, ref Vector3 currentPosition) 

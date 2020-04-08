@@ -10,6 +10,8 @@ public class VoxelHandler : MonoBehaviour
 
     public void Start()
     {
+        gameObject.GetComponent<Atlas>().GenerateAtlas();
+
         chunks = new GameObject[xChunkCount, zChunkCount];
 
         for (int x = 0; x < chunks.GetLength(0); x++)

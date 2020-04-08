@@ -152,7 +152,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   camera: {fileID: 495110359}
   voxelHandler: {fileID: 1880787654}
-  explosionSize: 5
+  explosionSize: 2
 --- !u!4 &186819387
 Transform:
   m_ObjectHideFlags: 0
