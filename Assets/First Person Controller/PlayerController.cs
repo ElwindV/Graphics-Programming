@@ -67,14 +67,15 @@ public class PlayerController : MonoBehaviour
 
     private void Movement()
     {
+        float yVelocity = m_MoveDirection.y;
+        Vector3 forwardMovement = transform.forward * Input.GetAxisRaw("Vertical");
+        Vector3 strafeMovement = transform.right * Input.GetAxisRaw("Horizontal");
+
+        m_MoveDirection = (forwardMovement + strafeMovement).normalized * m_MoveSpeed;
+        m_MoveDirection.y = yVelocity;
+
         if (m_CharacterController.isGrounded)
         {
-            Vector3 forwardMovement = transform.forward * Input.GetAxisRaw("Vertical");
-            Vector3 strafeMovement = transform.right * Input.GetAxisRaw("Horizontal");
-
-            m_MoveDirection = (forwardMovement + strafeMovement).normalized * m_MoveSpeed;
-
-
             if (Input.GetKeyDown(KeyCode.Space))
                 m_MoveDirection.y = m_JumpForce;
         }
