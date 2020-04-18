@@ -81,6 +81,7 @@ public class PlayerController : MonoBehaviour
         }
 
         m_MoveDirection.y -= m_GravityForce * Time.deltaTime;
+        m_MoveDirection.y = Mathf.Clamp(m_MoveDirection.y, Physics.gravity.y, -Physics.gravity.y);
 
         m_CharacterController.Move(m_MoveDirection * Time.deltaTime);
     }
