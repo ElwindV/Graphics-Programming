@@ -54,7 +54,8 @@ public class Atlas : MonoBehaviour
         }
         atlas.Apply();
 
-        material.mainTexture = atlas;
+        material.SetTexture("mainTexture", atlas);
+        material.SetFloat("noiseScale", 10f * dimensions);
     }
 
     public int GetAtlasDimension(int count) => (int)Mathf.Pow(2, Mathf.Ceil(Mathf.Log(count) / Mathf.Log(4)));
