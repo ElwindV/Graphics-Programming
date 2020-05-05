@@ -69,6 +69,26 @@
                 "side": "leaf",
                 "bottom": "leaf"
             }
+        },
+        {
+            "id": 7,
+            "name": "Wood",
+            "transparant": false,
+            "textures": {
+                "top": "wood",
+                "side": "wood",
+                "bottom": "wood"
+            }
+        },
+        {
+            "id": 8,
+            "name": "Water",
+            "transparant": true,
+            "textures": {
+                "top": "water",
+                "side": "water",
+                "bottom": "water"
+            }
         }
     ]
 }

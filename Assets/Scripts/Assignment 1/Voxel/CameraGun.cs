@@ -18,7 +18,7 @@ public class CameraGun : MonoBehaviour
         }
         if (Input.GetMouseButtonDown(1))
         {
-            Refresh();
+            Build();
         }
     }
 
@@ -26,44 +26,34 @@ public class CameraGun : MonoBehaviour
     {
         RaycastHit hit;
         Ray ray = camera.ScreenPointToRay(Input.mousePosition);
-        if (!Physics.Raycast(ray, out hit, 100f))
+        if (!Physics.Raycast(ray, out hit, 4f))
         {
             return;
         }
 
-        int xChunkCount = voxelHandler.chunks.GetLength(0);
-        int zChunkCount = voxelHandler.chunks.GetLength(1);
-        int chunkOverlap = (int)(16f / explosionSize) + 2;
+        Vector3 somewhereInBlock = hit.point + ray.direction.normalized * 0.01f;
 
-        int xExplosionChunk = (int)hit.transform.position.x / 16;
-        int zExplosionChunk = (int)hit.transform.position.z / 16;
+        int x = Mathf.FloorToInt(somewhereInBlock.x);
+        int y = Mathf.FloorToInt(somewhereInBlock.y);
+        int z = Mathf.FloorToInt(somewhereInBlock.z);
 
-        for (int x = Mathf.Max(xExplosionChunk - chunkOverlap, 0) ; x <= xExplosionChunk + chunkOverlap && x < xChunkCount; x++)
-        {
-            for (int z = Mathf.Max(zExplosionChunk - chunkOverlap, 0); z <= zExplosionChunk + chunkOverlap && z < zChunkCount; z++)
-            {
-                voxelHandler.chunks[x, z].GetComponent<Chunk>().DestroyRadius(hit.point, explosionSize);
-            }
-        }
-        for (int x = Mathf.Max(xExplosionChunk - chunkOverlap, 0); x <= xExplosionChunk + chunkOverlap && x < xChunkCount; x++)
-        {
-            for (int z = Mathf.Max(zExplosionChunk - chunkOverlap, 0); z <= zExplosionChunk + chunkOverlap && z < zChunkCount; z++)
-            {
-                voxelHandler.chunks[x, z].GetComponent<ChunkMesh>().Refresh();
-            }
-        }
+        VoxelHandler.instance.SetBlock(x, y, z, Blocks.Air);
     }
-
-    protected void Refresh() 
+    protected void Build()
     {
         RaycastHit hit;
         Ray ray = camera.ScreenPointToRay(Input.mousePosition);
-        if (!Physics.Raycast(ray, out hit, 100f))
+        if (!Physics.Raycast(ray, out hit, 4f))
         {
             return;
         }
 
-        GameObject chunk = hit.transform.gameObject;
-        chunk.GetComponent<ChunkMesh>().Refresh();
+        Vector3 somewhereInBlock = hit.point - ray.direction.normalized * 0.01f;
+
+        int x = Mathf.FloorToInt(somewhereInBlock.x);
+        int y = Mathf.FloorToInt(somewhereInBlock.y);
+        int z = Mathf.FloorToInt(somewhereInBlock.z);
+
+        VoxelHandler.instance.SetBlock(x, y, z, Blocks.Wood);
     }
 }

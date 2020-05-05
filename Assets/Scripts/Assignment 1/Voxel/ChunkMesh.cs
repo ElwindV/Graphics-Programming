@@ -16,10 +16,14 @@ public class ChunkMesh : MonoBehaviour
     protected List<Vector3> normalList;
     protected List<Vector2> uvList;
 
-    protected Chunk leftChunk;
-    protected Chunk rightChunk;
-    protected Chunk frontChunk;
-    protected Chunk backChunk;
+    [HideInInspector]
+    public Chunk leftChunk;
+    [HideInInspector]
+    public Chunk rightChunk;
+    [HideInInspector]
+    public Chunk frontChunk;
+    [HideInInspector]
+    public Chunk backChunk;
 
     void Start()
     {
@@ -61,9 +65,12 @@ public class ChunkMesh : MonoBehaviour
         normalList = new List<Vector3>();
         uvList = new List<Vector2>();
 
-        for (int x = 0; x < chunk.blocks.GetLength(0); x++) {
-            for (int y = 0; y < chunk.blocks.GetLength(1); y++) {
-                for (int z = 0; z < chunk.blocks.GetLength(2); z++) {
+        for (int x = 0; x < chunk.blocks.GetLength(0); x++)
+        {
+            for (int y = 0; y < chunk.blocks.GetLength(1); y++)
+            {
+                for (int z = 0; z < chunk.blocks.GetLength(2); z++)
+                {
                     byte block = chunk.blocks[x, y, z];
                     Vector3 currentPosition = new Vector3(x, y, z);
 
@@ -72,16 +79,16 @@ public class ChunkMesh : MonoBehaviour
                         continue;
                     }
 
-                    byte rightBlock = ((x + 1 < chunk.blocks.GetLength(0)) ? chunk.blocks[x + 1, y, z] 
-                        : ((rightChunk != null) ? rightChunk.blocks[0,y,z] : (byte)Blocks.Air));
+                    byte rightBlock = ((x + 1 < chunk.blocks.GetLength(0)) ? chunk.blocks[x + 1, y, z]
+                        : ((rightChunk != null) ? rightChunk.blocks[0, y, z] : (byte)Blocks.Air));
                     byte leftBlock = ((x - 1 >= 0) ? chunk.blocks[x - 1, y, z]
                         : ((leftChunk != null) ? leftChunk.blocks[leftChunk.ChunkWidth - 1, y, z] : (byte)Blocks.Air));
 
                     byte topBlock = ((y + 1 < chunk.blocks.GetLength(1)) ? chunk.blocks[x, y + 1, z] : (byte)Blocks.Air);
-                    byte bottomBlock = ((y - 1 >= 0) ? chunk.blocks[x, y - 1, z] : (byte) Blocks.Air);
+                    byte bottomBlock = ((y - 1 >= 0) ? chunk.blocks[x, y - 1, z] : (byte)Blocks.Air);
 
                     byte backBlock = ((z + 1 < chunk.blocks.GetLength(2)) ? chunk.blocks[x, y, z + 1]
-                        : ((backChunk != null) ? backChunk.blocks[x,y,0] : (byte)Blocks.Air));
+                        : ((backChunk != null) ? backChunk.blocks[x, y, 0] : (byte)Blocks.Air));
                     byte frontBlock = ((z - 1 >= 0) ? chunk.blocks[x, y, z - 1]
                         : ((frontChunk != null) ? frontChunk.blocks[x, y, frontChunk.ChunkDepth - 1] : (byte)Blocks.Air));
 
@@ -103,13 +110,15 @@ public class ChunkMesh : MonoBehaviour
         meshCollider.sharedMesh = mesh;
     }
 
-    protected void AddFaceNormals(Vector3 direction) {
-        for (short i = 0; i < 4; i++) {
+    protected void AddFaceNormals(Vector3 direction)
+    {
+        for (short i = 0; i < 4; i++)
+        {
             normalList.Add(direction);
         }
     }
 
-    protected void AddTriangles(int baseVertexNumber) 
+    protected void AddTriangles(int baseVertexNumber)
     {
         triangleList.Add(baseVertexNumber + 0);
         triangleList.Add(baseVertexNumber + 3);
@@ -120,15 +129,15 @@ public class ChunkMesh : MonoBehaviour
         triangleList.Add(baseVertexNumber + 3);
     }
 
-    protected void AddUVs(byte blockByte, Sides side) 
+    protected void AddUVs(byte blockByte, Sides side)
     {
         Vector2 textureStart;
 
-        Block block = VoxelHandler.instance.blockData[((Blocks) blockByte).ToString()];
-        string texture = (side == Sides.Top) 
+        Block block = VoxelHandler.instance.blockData[((Blocks)blockByte).ToString()];
+        string texture = (side == Sides.Top)
             ? block.textures.top
-            : (side == Sides.Bottom) 
-                ? block.textures.bottom 
+            : (side == Sides.Bottom)
+                ? block.textures.bottom
                 : block.textures.side;
         textureStart = Atlas.uvs[texture];
 
@@ -139,21 +148,24 @@ public class ChunkMesh : MonoBehaviour
         uvList.Add(textureStart + divider * Vector2.right + divider * Vector2.up);
     }
 
-    protected void HandleRight(ref byte blockByte, ref byte rightBlockByte, ref Vector3 currentPosition) 
+    protected void HandleRight(ref byte blockByte, ref byte rightBlockByte, ref Vector3 currentPosition)
     {
         Block block = VoxelHandler.instance.blockData[((Blocks)blockByte).ToString()];
         Block rightBlock = VoxelHandler.instance.blockData[((Blocks)rightBlockByte).ToString()];
 
         bool isVisible = false;
 
-        if (! block.transparant && rightBlock.transparant) {
+        if (!block.transparant && rightBlock.transparant)
+        {
             isVisible = true;
         }
-        if (rightBlockByte == (byte) Blocks.Air) {
+        if (rightBlockByte == (byte)Blocks.Air)
+        {
             isVisible = true;
         }
-        
-        if (! isVisible) {
+
+        if (!isVisible)
+        {
             return;
         }
 
@@ -168,14 +180,14 @@ public class ChunkMesh : MonoBehaviour
         AddUVs(blockByte, Sides.Right);
     }
 
-    protected void HandleLeft(ref byte blockByte, ref byte leftBlockByte, ref Vector3 currentPosition) 
+    protected void HandleLeft(ref byte blockByte, ref byte leftBlockByte, ref Vector3 currentPosition)
     {
         Block block = VoxelHandler.instance.blockData[((Blocks)blockByte).ToString()];
         Block leftBlock = VoxelHandler.instance.blockData[((Blocks)leftBlockByte).ToString()];
 
         bool isVisible = false;
 
-        if (! block.transparant && leftBlock.transparant)
+        if (!block.transparant && leftBlock.transparant)
         {
             isVisible = true;
         }
@@ -184,7 +196,7 @@ public class ChunkMesh : MonoBehaviour
             isVisible = true;
         }
 
-        if ( !isVisible)
+        if (!isVisible)
         {
             return;
         }
@@ -200,7 +212,7 @@ public class ChunkMesh : MonoBehaviour
         AddUVs(blockByte, Sides.Left);
     }
 
-    protected void HandleTop(ref byte blockByte, ref byte topBlockByte, ref Vector3 currentPosition) 
+    protected void HandleTop(ref byte blockByte, ref byte topBlockByte, ref Vector3 currentPosition)
     {
         Block block = VoxelHandler.instance.blockData[((Blocks)blockByte).ToString()];
         Block topBlock = VoxelHandler.instance.blockData[((Blocks)topBlockByte).ToString()];
@@ -232,7 +244,7 @@ public class ChunkMesh : MonoBehaviour
         AddUVs(blockByte, Sides.Top);
     }
 
-    protected void HandleBottom(ref byte blockByte, ref byte bottomBlockByte, ref Vector3 currentPosition) 
+    protected void HandleBottom(ref byte blockByte, ref byte bottomBlockByte, ref Vector3 currentPosition)
     {
         Block block = VoxelHandler.instance.blockData[((Blocks)blockByte).ToString()];
         Block bottomBlock = VoxelHandler.instance.blockData[((Blocks)bottomBlockByte).ToString()];
@@ -265,7 +277,7 @@ public class ChunkMesh : MonoBehaviour
 
     }
 
-    protected void HandleBack(ref byte blockByte, ref byte backBlockByte, ref Vector3 currentPosition) 
+    protected void HandleBack(ref byte blockByte, ref byte backBlockByte, ref Vector3 currentPosition)
     {
         Block block = VoxelHandler.instance.blockData[((Blocks)blockByte).ToString()];
         Block backBlock = VoxelHandler.instance.blockData[((Blocks)backBlockByte).ToString()];
@@ -297,7 +309,7 @@ public class ChunkMesh : MonoBehaviour
         AddUVs(blockByte, Sides.Back);
     }
 
-    protected void HandleFront(ref byte blockByte, ref byte frontBlockByte, ref Vector3 currentPosition) 
+    protected void HandleFront(ref byte blockByte, ref byte frontBlockByte, ref Vector3 currentPosition)
     {
         Block block = VoxelHandler.instance.blockData[((Blocks)blockByte).ToString()];
         Block frontBlock = VoxelHandler.instance.blockData[((Blocks)frontBlockByte).ToString()];

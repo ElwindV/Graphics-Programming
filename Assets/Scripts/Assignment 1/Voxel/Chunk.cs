@@ -86,7 +86,7 @@ public class Chunk : MonoBehaviour
             }
         }
 
-        genererateCaves();
+        // genererateCaves();
     }
 
     public void genererateCaves() 

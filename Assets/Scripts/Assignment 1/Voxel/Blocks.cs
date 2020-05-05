@@ -8,4 +8,6 @@ public enum Blocks
     Bedrock = 4,
     Log     = 5,
     Leaf    = 6,
+    Wood    = 7,
+    Water   = 8,
 }
