@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System.Collections.Generic;
 
 public class VoxelHandler : MonoBehaviour
 {
@@ -8,10 +9,17 @@ public class VoxelHandler : MonoBehaviour
     [HideInInspector]
     public GameObject[,] chunks = new GameObject[0,0];
 
+    [HideInInspector]
+    public static VoxelHandler instance = null;
+
+    [HideInInspector]
+    public Dictionary<string, Block> blockData;
+
     public void Start()
     {
+        VoxelHandler.instance = this;
         gameObject.GetComponent<Atlas>().GenerateAtlas();
-
+        LoadBlockData();
         chunks = new GameObject[xChunkCount, zChunkCount];
 
         for (int x = 0; x < chunks.GetLength(0); x++)
@@ -38,9 +46,19 @@ public class VoxelHandler : MonoBehaviour
             for (int z = 0; z < chunks.GetLength(1); z++)
             {
                 ChunkMesh chunkMesh = chunks[x, z].AddComponent<ChunkMesh>();
-                chunkMesh.voxelHandler = this;
             }
         }
+    }
 
+    private void LoadBlockData() 
+    {
+        TextAsset jsonFile = Resources.Load<TextAsset>("Data/blocks");
+        BlockContainer blocksContainer = JsonUtility.FromJson<BlockContainer>(jsonFile.text);
+
+        blockData = new Dictionary<string, Block>();
+
+        foreach(Block block in blocksContainer.blocks) {
+            blockData[block.name] = block;
+        }
     }
 }
