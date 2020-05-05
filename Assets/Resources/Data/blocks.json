@@ -89,6 +89,26 @@
                 "side": "water",
                 "bottom": "water"
             }
+        },
+        {
+            "id": 8,
+            "name": "Sand",
+            "transparant": true,
+            "textures": {
+                "top": "sand",
+                "side": "sand",
+                "bottom": "sand"
+            }
+        },
+        {
+            "id": 8,
+            "name": "Snow",
+            "transparant": true,
+            "textures": {
+                "top": "snow",
+                "side": "snow",
+                "bottom": "snow"
+            }
         }
     ]
 }

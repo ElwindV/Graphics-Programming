@@ -10,4 +10,6 @@ public enum Blocks
     Leaf    = 6,
     Wood    = 7,
     Water   = 8,
+    Sand    = 9,
+    Snow    = 10,
 }
