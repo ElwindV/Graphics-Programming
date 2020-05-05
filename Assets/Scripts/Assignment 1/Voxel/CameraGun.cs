@@ -15,6 +15,7 @@ public class CameraGun : MonoBehaviour
     {
         if (Input.GetMouseButtonDown(0)) {
             Mine();
+            // PlantTree();
         }
         if (Input.GetMouseButtonDown(1))
         {
@@ -39,6 +40,24 @@ public class CameraGun : MonoBehaviour
 
         VoxelHandler.instance.SetBlock(x, y, z, Blocks.Air);
     }
+
+    protected void PlantTree()
+    {
+        RaycastHit hit;
+        Ray ray = camera.ScreenPointToRay(Input.mousePosition);
+        if (!Physics.Raycast(ray, out hit, 4f))
+        {
+            return;
+        }
+
+        Vector3 somewhereBeforeBlock = hit.point - ray.direction.normalized * 0.01f;
+
+        int x = Mathf.FloorToInt(somewhereBeforeBlock.x);
+        int z = Mathf.FloorToInt(somewhereBeforeBlock.z);
+
+        VoxelHandler.instance.PlaceTree(x, z, true);
+    }
+
     protected void Build()
     {
         RaycastHit hit;
@@ -48,11 +67,11 @@ public class CameraGun : MonoBehaviour
             return;
         }
 
-        Vector3 somewhereInBlock = hit.point - ray.direction.normalized * 0.01f;
+        Vector3 somewhereBeforeBlock = hit.point - ray.direction.normalized * 0.01f;
 
-        int x = Mathf.FloorToInt(somewhereInBlock.x);
-        int y = Mathf.FloorToInt(somewhereInBlock.y);
-        int z = Mathf.FloorToInt(somewhereInBlock.z);
+        int x = Mathf.FloorToInt(somewhereBeforeBlock.x);
+        int y = Mathf.FloorToInt(somewhereBeforeBlock.y);
+        int z = Mathf.FloorToInt(somewhereBeforeBlock.z);
 
         VoxelHandler.instance.SetBlock(x, y, z, Blocks.Wood);
     }

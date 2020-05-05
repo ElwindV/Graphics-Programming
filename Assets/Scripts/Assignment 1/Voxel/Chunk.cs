@@ -56,11 +56,6 @@ public class Chunk : MonoBehaviour
     [HideInInspector]
     public float caveCutoff = .40f;
 
-    public void Start()
-    {
-        Generate();
-    }
-
     public void Generate()
     {
         for (int x = 0; x < 16; x++)

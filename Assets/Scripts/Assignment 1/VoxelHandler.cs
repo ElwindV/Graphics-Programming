@@ -6,6 +6,8 @@ public class VoxelHandler : MonoBehaviour
     public int xChunkCount;
     public int zChunkCount;
 
+    public int treesPerChunk = 4;
+
     [HideInInspector]
     public GameObject[,] chunks = new GameObject[0, 0];
 
@@ -35,9 +37,23 @@ public class VoxelHandler : MonoBehaviour
                 Chunk chunkComponent = chunk.AddComponent<Chunk>();
                 chunkComponent.x = x;
                 chunkComponent.z = z;
+                chunkComponent.Generate();
 
                 chunks[x, z] = chunk;
             }
+        }
+
+        float turnfraction = (1f + Mathf.Sqrt(5)) / 2f;
+
+        int numberOfTrees = xChunkCount * zChunkCount * treesPerChunk;
+        for (int i = 0; i < numberOfTrees; i++) {
+            float distance = i / (numberOfTrees - 1f);
+            float angle = 2 * Mathf.PI * turnfraction * i;
+
+            float x = 64f + (64f * (distance * Mathf.Cos(angle)));
+            float z = 64f + (64f * (distance * Mathf.Sin(angle)));
+
+            PlaceTree((int) x, (int) z, false);
         }
 
         // This loop is seperate since all Meshes should be generated AFTER the chunks
@@ -47,6 +63,56 @@ public class VoxelHandler : MonoBehaviour
             {
                 ChunkMesh chunkMesh = chunks[x, z].AddComponent<ChunkMesh>();
             }
+        }
+    }
+
+    public void PlaceTree(int x, int z, bool updateMeshes = false)
+    {
+        // DETERMINE CHUNK
+        int chunkX = x / 16;
+        int chunkZ = z / 16;
+
+        if (chunkX > xChunkCount || chunkX < 0 || chunkZ > zChunkCount || chunkZ < 0)
+        {
+            return;
+        }
+
+        GameObject chunk = chunks[chunkX, chunkZ];
+
+        int localX = x % 16;
+        int localZ = z % 16;
+
+        Chunk chunkObject = chunk.GetComponent<Chunk>();
+        // DETERMINE BEGIN
+
+        int? root = null;
+        for (int y = chunkObject.ChunkHeight - 1; y >= 0; y--) {
+            byte block = chunkObject.blocks[localX, y, localZ];
+
+            if (block == (byte) Blocks.Grass) {
+                root = y + 1;
+            }
+        }
+
+        if (root == null) {
+            return;
+        }
+
+        for (int y = (int) root, i = 0; y < root + 8; y++, i++) {
+            SetBlock(x, y, z, Blocks.Log, updateMeshes);
+            if (i >= 3) {
+                SetBlock(x-1, y, z, Blocks.Leaf, updateMeshes);
+                SetBlock(x+1, y, z, Blocks.Leaf, updateMeshes);
+                SetBlock(x, y, z-1, Blocks.Leaf, updateMeshes);
+                SetBlock(x, y, z+1, Blocks.Leaf, updateMeshes);
+            }
+            if (i == 5) {
+                SetBlock(x - 1, y, z - 1, Blocks.Leaf, updateMeshes);
+                SetBlock(x + 1, y, z - 1, Blocks.Leaf, updateMeshes);
+                SetBlock(x - 1, y, z + 1, Blocks.Leaf, updateMeshes);
+                SetBlock(x + 1, y, z + 1, Blocks.Leaf, updateMeshes);
+            }
+            SetBlock(x, y + 1, z, Blocks.Leaf, updateMeshes);
         }
     }
 
