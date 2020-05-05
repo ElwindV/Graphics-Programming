@@ -33,6 +33,18 @@ public class Chunk : MonoBehaviour
     public float factor = .07f;
 
     [HideInInspector]
+    public float islandFactor = .0002f;
+
+    [HideInInspector]
+    public int waterLevel = 12;
+
+    [HideInInspector]
+    public int maxGrassLevel = 18;
+
+    [HideInInspector]
+    public int snowLevel = 21;
+
+    [HideInInspector]
     public int x;
 
     [HideInInspector]
@@ -58,8 +70,15 @@ public class Chunk : MonoBehaviour
                 float xComponent = seed + ((transform.position.x + (x * 1f)) * factor);
                 float yComponent = seed + ((transform.position.z + (z * 1f)) * factor);
                 float noiseFactor = Mathf.PerlinNoise(xComponent, yComponent);
-                int stoneLayer = (int)(10f + noiseFactor * 10f);
+                int stoneLayer = (int)(10f + noiseFactor * 15f);
 
+                float worldX = Mathf.Pow(-64f + (transform.position.x + (x * 1f)), 2f);
+                float worldZ = Mathf.Pow(-64f + (transform.position.z + (z * 1f)), 2f);
+                float multiplier = 1 - (islandFactor * worldX + islandFactor * worldZ);
+                multiplier = Mathf.Clamp(multiplier, 0, 2f);
+
+                stoneLayer = (int)((stoneLayer * 1f) * multiplier);
+                
                 for (int y = 0; y < 32; y++)
                 {
                     if (y == 0)
@@ -70,13 +89,28 @@ public class Chunk : MonoBehaviour
                     {
                         blocks[x, y, z] = (byte)Blocks.Stone;
                     }
-                    else if (y < stoneLayer + 3)
+                    else if (y < stoneLayer + 3 && stoneLayer > waterLevel)
                     {
                         blocks[x, y, z] = (byte)Blocks.Dirt;
                     }
+                    else if (y == 1) {
+                        blocks[x, y, z] = (byte)Blocks.Sand;
+                    }
+                    else if (y < stoneLayer + 4 && y < waterLevel)
+                    {
+                        blocks[x, y, z] = (byte)Blocks.Sand;
+                    }
+                    else if (y < waterLevel)
+                    {
+                        blocks[x, y, z] = (byte)Blocks.Water;
+                    }
                     else if (y < stoneLayer + 4)
                     {
-                        blocks[x, y, z] = (byte)Blocks.Grass;
+                        blocks[x, y, z] = (y < maxGrassLevel) 
+                            ? (byte)Blocks.Grass 
+                            : (y > snowLevel)
+                                ? (byte)Blocks.Snow
+                                : (byte)Blocks.Stone;
                     }
                     else
                     {

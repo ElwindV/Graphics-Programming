@@ -93,7 +93,7 @@
         {
             "id": 8,
             "name": "Sand",
-            "transparant": true,
+            "transparant": false,
             "textures": {
                 "top": "sand",
                 "side": "sand",
@@ -103,7 +103,7 @@
         {
             "id": 8,
             "name": "Snow",
-            "transparant": true,
+            "transparant": false,
             "textures": {
                 "top": "snow",
                 "side": "snow",
