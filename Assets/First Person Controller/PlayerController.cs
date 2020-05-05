@@ -76,12 +76,16 @@ public class PlayerController : MonoBehaviour
 
         if (m_CharacterController.isGrounded)
         {
-            if (Input.GetKeyDown(KeyCode.Space))
-                m_MoveDirection.y = m_JumpForce;
-        }
+            m_MoveDirection.y = 0f;
 
-        m_MoveDirection.y -= m_GravityForce * Time.deltaTime;
-        m_MoveDirection.y = Mathf.Clamp(m_MoveDirection.y, Physics.gravity.y, -Physics.gravity.y);
+            if (Input.GetKey(KeyCode.Space)) 
+            {
+                m_MoveDirection.y = m_JumpForce;
+            }
+        } else {
+            m_MoveDirection.y -= m_GravityForce * Time.deltaTime;
+            m_MoveDirection.y = Mathf.Clamp(m_MoveDirection.y, Physics.gravity.y, -Physics.gravity.y);
+        }
 
         m_CharacterController.Move(m_MoveDirection * Time.deltaTime);
     }
