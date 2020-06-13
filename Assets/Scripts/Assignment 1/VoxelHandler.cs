@@ -26,6 +26,9 @@ public class VoxelHandler : MonoBehaviour
     [Range(-1f, 1f)]
     public float cutOffThreshold = 0f;
 
+    [Range(2f, 10f)]
+    public float cutOffDistance = 4f;
+
     public void Start()
     {
         if (Camera.main != null) _cameraTransform = Camera.main.transform;
@@ -105,13 +108,21 @@ public class VoxelHandler : MonoBehaviour
             for (var z = 0; z < chunks.GetLength(1); z++)
             {
                 var chunk = chunks[x, z];
-                var playerChunkPositionX = Mathf.FloorToInt(playerPosition.x / 16f);
-                var playerChunkPositionZ = Mathf.FloorToInt(playerPosition.z / 16f);
+                var currentChunkX = Mathf.FloorToInt(playerPosition.x / 16f);
+                var currentChunkZ = Mathf.FloorToInt(playerPosition.z / 16f);
     
                 // If the player is standing on a chunk keep if for collision
-                if (x == playerChunkPositionX && z == playerChunkPositionZ)
+                if (x == currentChunkX && z == currentChunkZ)
                 {
                     chunk.SetActive(true);
+                    continue;
+                }
+
+                float chunkGapX = currentChunkX - x;
+                float chunkGapZ = currentChunkZ - z;
+                if ((chunkGapX * chunkGapX) + (chunkGapZ * chunkGapZ) > (cutOffDistance * cutOffDistance))
+                {
+                    chunk.SetActive(false);
                     continue;
                 }
 
