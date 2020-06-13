@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using System.Collections.Generic;
 
 public class VoxelHandler : MonoBehaviour
@@ -16,25 +17,36 @@ public class VoxelHandler : MonoBehaviour
 
     [HideInInspector]
     public Dictionary<string, Block> blockData;
+    
+    private Transform _cameraTransform;
+    private Transform _playerTransform;
+    
+    private Vector3[] _chunkOffsets;
+
+    [Range(-1f, 1f)]
+    public float cutOffThreshold = 0f;
 
     public void Start()
     {
+        if (Camera.main != null) _cameraTransform = Camera.main.transform;
+        if (Camera.main != null) _playerTransform = Camera.main.transform.parent.transform;
+
         VoxelHandler.instance = this;
         gameObject.GetComponent<Atlas>().GenerateAtlas();
         LoadBlockData();
         chunks = new GameObject[xChunkCount, zChunkCount];
 
-        for (int x = 0; x < chunks.GetLength(0); x++)
+        for (var x = 0; x < chunks.GetLength(0); x++)
         {
-            for (int z = 0; z < chunks.GetLength(1); z++)
+            for (var z = 0; z < chunks.GetLength(1); z++)
             {
-                GameObject chunk = new GameObject();
+                var chunk = new GameObject();
 
                 chunk.transform.SetParent(this.transform);
                 chunk.name = $"Chunk {x}:{z}";
                 chunk.transform.position = new Vector3(16 * x, 0, 16 * z);
 
-                Chunk chunkComponent = chunk.AddComponent<Chunk>();
+                var chunkComponent = chunk.AddComponent<Chunk>();
                 chunkComponent.x = x;
                 chunkComponent.z = z;
                 chunkComponent.Generate();
@@ -43,25 +55,78 @@ public class VoxelHandler : MonoBehaviour
             }
         }
 
-        float turnfraction = (1f + Mathf.Sqrt(5)) / 2f;
+        var turnFraction = (1f + Mathf.Sqrt(5)) / 2f;
 
-        int numberOfTrees = xChunkCount * zChunkCount * treesPerChunk;
-        for (int i = 0; i < numberOfTrees; i++) {
-            float distance = i / (numberOfTrees - 1f);
-            float angle = 2 * Mathf.PI * turnfraction * i;
+        var numberOfTrees = xChunkCount * zChunkCount * treesPerChunk;
+        for (var i = 0; i < numberOfTrees; i++) {
+            var distance = i / (numberOfTrees - 1f);
+            var angle = 2 * Mathf.PI * turnFraction * i;
 
-            float x = 64f + (64f * (distance * Mathf.Cos(angle)));
-            float z = 64f + (64f * (distance * Mathf.Sin(angle)));
+            var x = 64f + (64f * (distance * Mathf.Cos(angle)));
+            var z = 64f + (64f * (distance * Mathf.Sin(angle)));
 
             PlaceTree((int) x, (int) z, false);
         }
 
         // This loop is seperate since all Meshes should be generated AFTER the chunks
-        for (int x = 0; x < chunks.GetLength(0); x++)
+        for (var x = 0; x < chunks.GetLength(0); x++)
         {
-            for (int z = 0; z < chunks.GetLength(1); z++)
+            for (var z = 0; z < chunks.GetLength(1); z++)
             {
-                ChunkMesh chunkMesh = chunks[x, z].AddComponent<ChunkMesh>();
+                var chunkMesh = chunks[x, z].AddComponent<ChunkMesh>();
+            }
+        }
+
+        _chunkOffsets = new[]
+        {
+            new Vector3(0f, 0f, 0f),
+            new Vector3(16f, 0f, 0f),
+            new Vector3(0f, 32f, 0f),
+            new Vector3(16f, 32f, 0f),
+            new Vector3(0f, 0f, 16f),
+            new Vector3(16f, 0f, 16f),
+            new Vector3(0f, 32f, 16f),
+            new Vector3(16f, 32f, 16f),
+        };
+    }
+
+    public void Update()
+    {
+        if (_cameraTransform == null || _playerTransform == null)
+        {
+            return;
+        }
+        
+        var forward = _cameraTransform.rotation * Vector3.forward;
+        var playerPosition = _playerTransform.position;
+
+        for (var x = 0; x < chunks.GetLength(0); x++)
+        {
+            for (var z = 0; z < chunks.GetLength(1); z++)
+            {
+                var chunk = chunks[x, z];
+                var playerChunkPositionX = Mathf.FloorToInt(playerPosition.x / 16f);
+                var playerChunkPositionZ = Mathf.FloorToInt(playerPosition.z / 16f);
+    
+                // If the player is standing on a chunk keep if for collision
+                if (x == playerChunkPositionX && z == playerChunkPositionZ)
+                {
+                    chunk.SetActive(true);
+                    continue;
+                }
+
+                var isActive = false;
+
+                foreach (var offset in _chunkOffsets)
+                {
+                    var relativeChunkCornerPosition = (chunk.transform.position + offset) - playerPosition;
+
+                    if (!(Vector3.Dot(forward.normalized, relativeChunkCornerPosition.normalized) > cutOffThreshold)) continue;
+                    isActive = true;
+                    break;
+                }
+
+                chunk.SetActive(isActive);
             }
         }
     }
@@ -69,25 +134,25 @@ public class VoxelHandler : MonoBehaviour
     public void PlaceTree(int x, int z, bool updateMeshes = false)
     {
         // DETERMINE CHUNK
-        int chunkX = x / 16;
-        int chunkZ = z / 16;
+        var chunkX = x / 16;
+        var chunkZ = z / 16;
 
         if (chunkX > xChunkCount || chunkX < 0 || chunkZ > zChunkCount || chunkZ < 0)
         {
             return;
         }
 
-        GameObject chunk = chunks[chunkX, chunkZ];
+        var chunk = chunks[chunkX, chunkZ];
 
-        int localX = x % 16;
-        int localZ = z % 16;
+        var localX = x % 16;
+        var localZ = z % 16;
 
-        Chunk chunkObject = chunk.GetComponent<Chunk>();
+        var chunkObject = chunk.GetComponent<Chunk>();
         // DETERMINE BEGIN
 
         int? root = null;
-        for (int y = chunkObject.ChunkHeight - 1; y >= 0; y--) {
-            byte block = chunkObject.blocks[localX, y, localZ];
+        for (var y = chunkObject.ChunkHeight - 1; y >= 0; y--) {
+            var block = chunkObject.blocks[localX, y, localZ];
 
             if (block == (byte) Blocks.Grass) {
                 root = y + 1;
@@ -119,18 +184,18 @@ public class VoxelHandler : MonoBehaviour
     public void SetBlock(int x, int y, int z, Blocks block = Blocks.Stone, bool updateMeshes = true)
     {
         // DETERMINE CHUNK
-        int chunkX = x / 16;
-        int chunkZ = z / 16;
+        var chunkX = x / 16;
+        var chunkZ = z / 16;
 
         if (chunkX > xChunkCount || chunkX < 0 || chunkZ > zChunkCount || chunkZ < 0)
         {
             return;
         }
 
-        GameObject chunk = chunks[chunkX, chunkZ];
+        var chunk = chunks[chunkX, chunkZ];
 
-        int localX = x % 16;
-        int localZ = z % 16;
+        var localX = x % 16;
+        var localZ = z % 16;
 
         // REMOVE BLOCK
         chunk.GetComponent<Chunk>().blocks[localX, y, localZ] = (byte)block;
@@ -141,7 +206,7 @@ public class VoxelHandler : MonoBehaviour
         }
 
         // UPDATE MESH
-        ChunkMesh chunkMesh = chunk.GetComponent<ChunkMesh>();
+        var chunkMesh = chunk.GetComponent<ChunkMesh>();
         chunkMesh.Refresh();
 
         // UPDATE NEIGHBOURS
@@ -165,12 +230,12 @@ public class VoxelHandler : MonoBehaviour
 
     private void LoadBlockData()
     {
-        TextAsset jsonFile = Resources.Load<TextAsset>("Data/blocks");
-        BlockContainer blocksContainer = JsonUtility.FromJson<BlockContainer>(jsonFile.text);
+        var jsonFile = Resources.Load<TextAsset>("Data/blocks");
+        var blocksContainer = JsonUtility.FromJson<BlockContainer>(jsonFile.text);
 
         blockData = new Dictionary<string, Block>();
 
-        foreach (Block block in blocksContainer.blocks)
+        foreach (var block in blocksContainer.blocks)
         {
             blockData[block.name] = block;
         }

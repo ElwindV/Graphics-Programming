@@ -9,44 +9,44 @@ public class Atlas : MonoBehaviour
     public static Dictionary<string, Vector2> uvs;
     public static int dimensions = 0;
 
-    private Texture2D[] textures;
+    private Texture2D[] _textures;
 
-    private readonly int textureWidth = 16;
-    private readonly int textureHeight = 16;
+    private readonly int _textureWidth = 16;
+    private readonly int _textureHeight = 16;
 
     public void GenerateAtlas()
     {
         uvs = new Dictionary<string, Vector2>();
-        textures = Resources.LoadAll<Texture2D>("Atlas");
+        _textures = Resources.LoadAll<Texture2D>("Atlas");
 
-        int textureCount = textures.Length;
+        var textureCount = _textures.Length;
 
         dimensions = GetAtlasDimension(textureCount);
 
-        Texture2D atlas = new Texture2D(textureWidth * dimensions, textureHeight * dimensions)
+        var atlas = new Texture2D(_textureWidth * dimensions, _textureHeight * dimensions)
         {
             anisoLevel = 1,
             filterMode = FilterMode.Point
         };
 
-        for (int i = 0; i < textures.Length; i++) {
-            Texture2D texture = textures[i];
+        for (var i = 0; i < _textures.Length; i++) {
+            var texture = _textures[i];
 
-            int horizontalAtlasOffset = (i % dimensions) * textureWidth;
-            int verticalAtlasOffset = (i / dimensions) * textureHeight;
+            var horizontalAtlasOffset = (i % dimensions) * _textureWidth;
+            var verticalAtlasOffset = (i / dimensions) * _textureHeight;
 
-            int textureX = i % dimensions;
-            int textureY = i / dimensions;
+            var textureX = i % dimensions;
+            var textureY = i / dimensions;
 
             uvs.Add(
                 texture.name,
                 new Vector2((textureX * 1f) / (dimensions * 1f), (textureY * 1f) / (dimensions * 1f))
             );
 
-            Color[] pixels = texture.GetPixels(0, 0, texture.width, texture.height);
-            for (int y = 0; y < texture.height; y++)
+            var pixels = texture.GetPixels(0, 0, texture.width, texture.height);
+            for (var y = 0; y < texture.height; y++)
             {
-                for (int x = 0; x < texture.width; x++)
+                for (var x = 0; x < texture.width; x++)
                 {
                     atlas.SetPixel(x + horizontalAtlasOffset, y + verticalAtlasOffset, pixels[x + y * 16]);
                 }
@@ -57,5 +57,5 @@ public class Atlas : MonoBehaviour
         material.mainTexture = atlas;
     }
 
-    public int GetAtlasDimension(int count) => (int)Mathf.Pow(2, Mathf.Ceil(Mathf.Log(count) / Mathf.Log(4)));
+    private static int GetAtlasDimension(int count) => (int)Mathf.Pow(2, Mathf.Ceil(Mathf.Log(count) / Mathf.Log(4)));
 }

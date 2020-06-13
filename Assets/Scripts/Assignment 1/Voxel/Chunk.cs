@@ -5,26 +5,11 @@ public class Chunk : MonoBehaviour
     [HideInInspector]
     public byte[,,] blocks = new byte[16, 32, 16];
 
-    public int ChunkWidth
-    {
-        get {
-            return blocks.GetLength(0);
-        }
-    }
+    public int ChunkWidth => blocks.GetLength(0);
 
-    public int ChunkHeight {
-        get {
-            return blocks.GetLength(1);
-        }
-    }
+    public int ChunkHeight => blocks.GetLength(1);
 
-    public int ChunkDepth
-    {
-        get
-        {
-            return blocks.GetLength(2);
-        }
-    }
+    public int ChunkDepth => blocks.GetLength(2);
 
     [HideInInspector]
     public int seed = 4113;
@@ -58,23 +43,23 @@ public class Chunk : MonoBehaviour
 
     public void Generate()
     {
-        for (int x = 0; x < 16; x++)
+        for (var x = 0; x < 16; x++)
         {
-            for (int z = 0; z < 16; z++)
+            for (var z = 0; z < 16; z++)
             {
-                float xComponent = seed + ((transform.position.x + (x * 1f)) * factor);
-                float yComponent = seed + ((transform.position.z + (z * 1f)) * factor);
-                float noiseFactor = Mathf.PerlinNoise(xComponent, yComponent);
-                int stoneLayer = (int)(10f + noiseFactor * 15f);
+                var xComponent = seed + ((transform.position.x + (x * 1f)) * factor);
+                var yComponent = seed + ((transform.position.z + (z * 1f)) * factor);
+                var noiseFactor = Mathf.PerlinNoise(xComponent, yComponent);
+                var stoneLayer = (int)(10f + noiseFactor * 15f);
 
-                float worldX = Mathf.Pow(-64f + (transform.position.x + (x * 1f)), 2f);
-                float worldZ = Mathf.Pow(-64f + (transform.position.z + (z * 1f)), 2f);
-                float multiplier = 1 - (islandFactor * worldX + islandFactor * worldZ);
+                var worldX = Mathf.Pow(-64f + (transform.position.x + (x * 1f)), 2f);
+                var worldZ = Mathf.Pow(-64f + (transform.position.z + (z * 1f)), 2f);
+                var multiplier = 1 - (islandFactor * worldX + islandFactor * worldZ);
                 multiplier = Mathf.Clamp(multiplier, 0, 2f);
 
                 stoneLayer = (int)((stoneLayer * 1f) * multiplier);
                 
-                for (int y = 0; y < 32; y++)
+                for (var y = 0; y < 32; y++)
                 {
                     if (y == 0)
                     {
@@ -115,25 +100,25 @@ public class Chunk : MonoBehaviour
             }
         }
 
-        // genererateCaves();
+        // generateCaves();
     }
 
-    public void genererateCaves() 
+    public void generateCaves() 
     {
-        for (int x = 0; x < 16; x++)
+        for (var x = 0; x < 16; x++)
         {
-            for (int z = 0; z < 16; z++)
+            for (var z = 0; z < 16; z++)
             {
-                for (int y = 0; y < 32; y++)
+                for (var y = 0; y < 32; y++)
                 {
                     if (y == 0) {
                         continue;
                     }
 
-                    float xComponent = seed + ((transform.position.x + (x * 1f)) * caveFactor);
-                    float yComponent = seed + ((transform.position.z + (z * 1f)) * caveFactor);
-                    float zComponent = seed + ((transform.position.y + (y * 1f)) * caveFactor);
-                    float noiseFactor = Perlin3D(xComponent, yComponent, zComponent);
+                    var xComponent = seed + ((transform.position.x + (x * 1f)) * caveFactor);
+                    var yComponent = seed + ((transform.position.z + (z * 1f)) * caveFactor);
+                    var zComponent = seed + ((transform.position.y + (y * 1f)) * caveFactor);
+                    var noiseFactor = Perlin3D(xComponent, yComponent, zComponent);
 
                     if (noiseFactor < caveCutoff) {
                         blocks[x, y, z] = (byte) Blocks.Air;

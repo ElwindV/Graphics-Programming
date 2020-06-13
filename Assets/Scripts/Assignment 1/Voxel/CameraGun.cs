@@ -23,20 +23,20 @@ public class CameraGun : MonoBehaviour
         }
     }
 
-    protected void Mine()
+    private void Mine()
     {
         RaycastHit hit;
-        Ray ray = camera.ScreenPointToRay(Input.mousePosition);
+        var ray = camera.ScreenPointToRay(Input.mousePosition);
         if (!Physics.Raycast(ray, out hit, 4f))
         {
             return;
         }
 
-        Vector3 somewhereInBlock = hit.point + ray.direction.normalized * 0.01f;
+        var somewhereInBlock = hit.point + ray.direction.normalized * 0.01f;
 
-        int x = Mathf.FloorToInt(somewhereInBlock.x);
-        int y = Mathf.FloorToInt(somewhereInBlock.y);
-        int z = Mathf.FloorToInt(somewhereInBlock.z);
+        var x = Mathf.FloorToInt(somewhereInBlock.x);
+        var y = Mathf.FloorToInt(somewhereInBlock.y);
+        var z = Mathf.FloorToInt(somewhereInBlock.z);
 
         VoxelHandler.instance.SetBlock(x, y, z, Blocks.Air);
     }
@@ -44,34 +44,34 @@ public class CameraGun : MonoBehaviour
     protected void PlantTree()
     {
         RaycastHit hit;
-        Ray ray = camera.ScreenPointToRay(Input.mousePosition);
+        var ray = camera.ScreenPointToRay(Input.mousePosition);
         if (!Physics.Raycast(ray, out hit, 4f))
         {
             return;
         }
 
-        Vector3 somewhereBeforeBlock = hit.point - ray.direction.normalized * 0.01f;
+        var somewhereBeforeBlock = hit.point - ray.direction.normalized * 0.01f;
 
-        int x = Mathf.FloorToInt(somewhereBeforeBlock.x);
-        int z = Mathf.FloorToInt(somewhereBeforeBlock.z);
+        var x = Mathf.FloorToInt(somewhereBeforeBlock.x);
+        var z = Mathf.FloorToInt(somewhereBeforeBlock.z);
 
         VoxelHandler.instance.PlaceTree(x, z, true);
     }
 
-    protected void Build()
+    private void Build()
     {
         RaycastHit hit;
-        Ray ray = camera.ScreenPointToRay(Input.mousePosition);
+        var ray = camera.ScreenPointToRay(Input.mousePosition);
         if (!Physics.Raycast(ray, out hit, 4f))
         {
             return;
         }
 
-        Vector3 somewhereBeforeBlock = hit.point - ray.direction.normalized * 0.01f;
+        var somewhereBeforeBlock = hit.point - ray.direction.normalized * 0.01f;
 
-        int x = Mathf.FloorToInt(somewhereBeforeBlock.x);
-        int y = Mathf.FloorToInt(somewhereBeforeBlock.y);
-        int z = Mathf.FloorToInt(somewhereBeforeBlock.z);
+        var x = Mathf.FloorToInt(somewhereBeforeBlock.x);
+        var y = Mathf.FloorToInt(somewhereBeforeBlock.y);
+        var z = Mathf.FloorToInt(somewhereBeforeBlock.z);
 
         VoxelHandler.instance.SetBlock(x, y, z, Blocks.Wood);
     }
