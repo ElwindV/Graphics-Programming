@@ -95,7 +95,8 @@ public class ChunkMesh : MonoBehaviour
                     HandleRight(ref block, ref rightBlock, ref currentPosition);
                     HandleLeft(ref block, ref leftBlock, ref currentPosition);
                     HandleTop(ref block, ref topBlock, ref currentPosition);
-                    HandleBottom(ref block, ref bottomBlock, ref currentPosition);
+                    if (y != 0)
+                        HandleBottom(ref block, ref bottomBlock, ref currentPosition);
                     HandleBack(ref block, ref backBlock, ref currentPosition);
                     HandleFront(ref block, ref frontBlock, ref currentPosition);
                 }
@@ -267,14 +268,13 @@ public class ChunkMesh : MonoBehaviour
 
         int size = vertexList.Count;
         vertexList.Add(currentPosition + Vector3.right);                    // + 0
-        vertexList.Add(currentPosition);                                    // + 1
+        vertexList.Add(currentPosition);                                          // + 1
         vertexList.Add(currentPosition + Vector3.right + Vector3.forward);  // + 2
         vertexList.Add(currentPosition + Vector3.forward);                  // + 3
 
         AddFaceNormals(Vector3.down);
         AddTriangles(size);
         AddUVs(blockByte, Sides.Bottom);
-
     }
 
     protected void HandleBack(ref byte blockByte, ref byte backBlockByte, ref Vector3 currentPosition)
