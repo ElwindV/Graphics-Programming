@@ -15,8 +15,6 @@
         
         // Wave Displacement
         _WavesTex ("Wave Texture", 2D) = "white" {}
-        
-        _DistortTex ("Distortion Texture", 2D) = "white" {}
     }
     SubShader
     {
@@ -83,12 +81,10 @@
             
             float4 _FoamColor;
             float _FoamDist;
-            
-            sampler2D _DistortTex;
-            float4 _DistortTex_ST;
 
             fixed4 frag (v2f i) : SV_Target
             {
+                float4 mainTexColor = tex2D(_MainTex, i.uv);
                 float depth = tex2Dproj(_CameraDepthTexture, i.screenPos).r;
                 float linearDepth = LinearEyeDepth(depth);
                 float depthDiff = (linearDepth - i.screenPos.w) / _Distance;
@@ -103,7 +99,7 @@
                 
                 fixed4 col = lerp(_ShallowColor, _DeepColor, depthDiff);
 
-                return col;
+                return col * mainTexColor;
             }
             ENDCG
         }
