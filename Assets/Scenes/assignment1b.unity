@@ -427,6 +427,8 @@ MonoBehaviour:
   xChunkCount: 8
   zChunkCount: 8
   treesPerChunk: 4
+  cutOffThreshold: 0.5
+  cutOffDistance: 4
 --- !u!4 &1880787655
 Transform:
   m_ObjectHideFlags: 0
