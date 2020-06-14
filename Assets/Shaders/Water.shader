@@ -15,11 +15,14 @@
         
         // Wave Displacement
         _WavesTex ("Wave Texture", 2D) = "white" {}
+        
+        _DistortTex ("Distortion Texture", 2D) = "white" {}
     }
     SubShader
     {
         Tags 
         { 
+            "RenderType"="Transparent"
             "Queue"="Transparent"
         }
         LOD 100
@@ -68,7 +71,7 @@
                 
                 float4 waveValue = tex2Dlod(_WavesTex, float4(o.uv + _Time[1] / 16, 0, 0));
                 
-                // o.vertex.y = o.vertex.y + 0.2 * waveValue.r;
+                o.vertex.y = o.vertex.y + 0.2 * waveValue.r;
                 
                 return o;
             }
@@ -80,6 +83,9 @@
             
             float4 _FoamColor;
             float _FoamDist;
+            
+            sampler2D _DistortTex;
+            float4 _DistortTex_ST;
 
             fixed4 frag (v2f i) : SV_Target
             {
@@ -90,6 +96,9 @@
                 
                 if (depthDiff < _FoamDist && depthDiff != 0) {
                     return _FoamColor;
+                }
+                if (depthDiff == 0) {
+                    depthDiff = 1;
                 }
                 
                 fixed4 col = lerp(_ShallowColor, _DeepColor, depthDiff);
