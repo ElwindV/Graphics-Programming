@@ -85,7 +85,7 @@ Material:
     - _DepthMaxDistance: 1
     - _DepthMultiplier: 1
     - _DetailNormalMapScale: 1
-    - _Distance: 1.5
+    - _Distance: 1.68
     - _DstBlend: 0
     - _FoamDist: 0.2
     - _FoamMaxDistance: 0.4
@@ -106,10 +106,10 @@ Material:
     - _ZWrite: 1
     m_Colors:
     - _Color: {r: 0, g: 0.69343567, b: 0.99056596, a: 0.47058824}
-    - _DeepColor: {r: 0.24609372, g: 0.31640622, b: 0.70703125, a: 0.9}
+    - _DeepColor: {r: 0.24705882, g: 0.31764707, b: 0.7058824, a: 0.9}
     - _DepthGradientDeep: {r: 0.08599999, g: 0.40699998, b: 1, a: 0.749}
     - _DepthGradientShallow: {r: 0.32499996, g: 0.807, b: 0.971, a: 0.725}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _FoamColor: {r: 1, g: 1, b: 1, a: 1}
-    - _ShallowColor: {r: 0, g: 0.6875, b: 1, a: 0.69803923}
+    - _ShallowColor: {r: 0, g: 0.6862745, b: 1, a: 0.69803923}
     - _SurfaceNoiseScroll: {r: 0.03, g: 0.03, b: 0, a: 0}

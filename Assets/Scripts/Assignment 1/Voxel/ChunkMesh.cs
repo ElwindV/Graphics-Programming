@@ -3,18 +3,30 @@ using UnityEngine;
 
 public class ChunkMesh : MonoBehaviour
 {
-    protected MeshFilter meshFilter;
-    protected Mesh mesh;
-    protected MeshRenderer meshRenderer;
-    protected MeshCollider meshCollider;
+    private MeshFilter meshFilter;
+    private Mesh mesh;
+    private MeshRenderer meshRenderer;
+    private MeshCollider meshCollider;
 
-    protected Chunk chunk;
-    protected Material material;
+    private GameObject waterObject;
+    private MeshFilter waterMeshFilter;
+    private Mesh waterMesh;
+    private MeshRenderer waterMeshRenderer;
 
-    protected List<Vector3> vertexList;
-    protected List<int> triangleList;
-    protected List<Vector3> normalList;
-    protected List<Vector2> uvList;
+    private Chunk chunk;
+    private Material material;
+
+    private Material waterMaterial;
+
+    private List<Vector3> vertexList;
+    private List<int> triangleList;
+    private List<Vector3> normalList;
+    private List<Vector2> uvList;
+
+    private List<Vector3> waterVertexList;
+    private List<int> waterTriangleList;
+    private List<Vector3> waterNormalList;
+    private List<Vector2> waterUvList;
 
     [HideInInspector]
     public Chunk leftChunk;
@@ -25,22 +37,32 @@ public class ChunkMesh : MonoBehaviour
     [HideInInspector]
     public Chunk backChunk;
 
-    void Start()
+    private void Start()
     {
         Setup();
         Refresh();
     }
 
-    public void Setup()
+    private void Setup()
     {
         meshFilter = this.gameObject.AddComponent<MeshFilter>();
         meshRenderer = this.gameObject.AddComponent<MeshRenderer>();
         meshCollider = this.gameObject.AddComponent<MeshCollider>();
 
+        waterObject = new GameObject();
+        waterObject.transform.parent = this.transform;
+        waterObject.name = "Water";
+        waterObject.transform.localPosition = Vector3.zero;
+        waterMeshFilter = waterObject.AddComponent<MeshFilter>();
+        waterMeshRenderer = waterObject.AddComponent<MeshRenderer>();
+
         chunk = this.gameObject.GetComponent<Chunk>();
 
         material = Resources.Load<Material>("Materials/Voxel");
         meshRenderer.material = this.material;
+        
+        waterMaterial = Resources.Load<Material>("Materials/Water");
+        waterMeshRenderer.material = this.waterMaterial;
 
         leftChunk = (chunk.x - 1 >= 0)
             ? VoxelHandler.instance.chunks[chunk.x - 1, chunk.z].GetComponent<Chunk>()
@@ -58,12 +80,18 @@ public class ChunkMesh : MonoBehaviour
 
     public void Refresh()
     {
-        Mesh mesh = new Mesh();
+        var mesh = new Mesh();
+        var waterMesh = new Mesh();
 
         vertexList = new List<Vector3>();
         triangleList = new List<int>();
         normalList = new List<Vector3>();
         uvList = new List<Vector2>();
+        
+        waterVertexList = new List<Vector3>();
+        waterTriangleList = new List<int>();
+        waterNormalList = new List<Vector3>();
+        waterUvList = new List<Vector2>();
 
         for (int x = 0; x < chunk.blocks.GetLength(0); x++)
         {
@@ -72,7 +100,7 @@ public class ChunkMesh : MonoBehaviour
                 for (int z = 0; z < chunk.blocks.GetLength(2); z++)
                 {
                     byte block = chunk.blocks[x, y, z];
-                    Vector3 currentPosition = new Vector3(x, y, z);
+                    var currentPosition = new Vector3(x, y, z);
 
                     if (block == (byte)Blocks.Air)
                     {
@@ -109,18 +137,43 @@ public class ChunkMesh : MonoBehaviour
         mesh.normals = normalList.ToArray();
         mesh.uv = uvList.ToArray();
         meshCollider.sharedMesh = mesh;
+        
+        waterMeshFilter.mesh = waterMesh;
+        waterMesh.vertices = waterVertexList.ToArray();
+        waterMesh.triangles = waterTriangleList.ToArray();
+        waterMesh.normals = waterNormalList.ToArray();
+        waterMesh.uv = waterUvList.ToArray();
     }
 
-    protected void AddFaceNormals(Vector3 direction)
+    private void AddFaceNormals(Vector3 direction, bool isWater = false)
     {
         for (short i = 0; i < 4; i++)
         {
+            if (isWater)
+            {
+                waterNormalList.Add(direction);
+                continue;
+            }
+
             normalList.Add(direction);
         }
     }
 
-    protected void AddTriangles(int baseVertexNumber)
+    private void AddTriangles(int baseVertexNumber, bool isWater = false)
     {
+        if (isWater)
+        {
+            waterTriangleList.Add(baseVertexNumber + 0);
+            waterTriangleList.Add(baseVertexNumber + 3);
+            waterTriangleList.Add(baseVertexNumber + 1);
+
+            waterTriangleList.Add(baseVertexNumber + 0);
+            waterTriangleList.Add(baseVertexNumber + 2);
+            waterTriangleList.Add(baseVertexNumber + 3);
+            
+            return;
+        }
+
         triangleList.Add(baseVertexNumber + 0);
         triangleList.Add(baseVertexNumber + 3);
         triangleList.Add(baseVertexNumber + 1);
@@ -130,8 +183,18 @@ public class ChunkMesh : MonoBehaviour
         triangleList.Add(baseVertexNumber + 3);
     }
 
-    protected void AddUVs(byte blockByte, Sides side)
+    private void AddUVs(byte blockByte, Sides side, bool isWater = false)
     {
+        if (isWater)
+        {
+            waterUvList.Add(Vector2.zero);
+            waterUvList.Add(Vector2.right);
+            waterUvList.Add(Vector2.up);
+            waterUvList.Add(Vector2.right + Vector2.up);
+
+            return;
+        }
+
         Vector2 textureStart;
 
         Block block = VoxelHandler.instance.blockData[((Blocks)blockByte).ToString()];
@@ -149,12 +212,17 @@ public class ChunkMesh : MonoBehaviour
         uvList.Add(textureStart + divider * Vector2.right + divider * Vector2.up);
     }
 
-    protected void HandleRight(ref byte blockByte, ref byte rightBlockByte, ref Vector3 currentPosition)
+    private void HandleRight(ref byte blockByte, ref byte rightBlockByte, ref Vector3 currentPosition)
     {
         Block block = VoxelHandler.instance.blockData[((Blocks)blockByte).ToString()];
         Block rightBlock = VoxelHandler.instance.blockData[((Blocks)rightBlockByte).ToString()];
 
         bool isVisible = false;
+
+        if (blockByte == (byte) Blocks.Water)
+        {
+            return;
+        }
 
         if (!block.transparant && rightBlock.transparant)
         {
@@ -181,13 +249,18 @@ public class ChunkMesh : MonoBehaviour
         AddUVs(blockByte, Sides.Right);
     }
 
-    protected void HandleLeft(ref byte blockByte, ref byte leftBlockByte, ref Vector3 currentPosition)
+    private void HandleLeft(ref byte blockByte, ref byte leftBlockByte, ref Vector3 currentPosition)
     {
         Block block = VoxelHandler.instance.blockData[((Blocks)blockByte).ToString()];
         Block leftBlock = VoxelHandler.instance.blockData[((Blocks)leftBlockByte).ToString()];
 
         bool isVisible = false;
 
+        if (blockByte == (byte) Blocks.Water)
+        {
+            return;
+        }
+        
         if (!block.transparant && leftBlock.transparant)
         {
             isVisible = true;
@@ -213,7 +286,7 @@ public class ChunkMesh : MonoBehaviour
         AddUVs(blockByte, Sides.Left);
     }
 
-    protected void HandleTop(ref byte blockByte, ref byte topBlockByte, ref Vector3 currentPosition)
+    private void HandleTop(ref byte blockByte, ref byte topBlockByte, ref Vector3 currentPosition)
     {
         Block block = VoxelHandler.instance.blockData[((Blocks)blockByte).ToString()];
         Block topBlock = VoxelHandler.instance.blockData[((Blocks)topBlockByte).ToString()];
@@ -234,6 +307,22 @@ public class ChunkMesh : MonoBehaviour
             return;
         }
 
+        if (blockByte == (byte) Blocks.Water)
+        {
+            int waterSize = waterVertexList.Count;
+            
+            waterVertexList.Add(currentPosition + Vector3.up);                                    // + 0
+            waterVertexList.Add(currentPosition + Vector3.up + Vector3.right);                    // + 1
+            waterVertexList.Add(currentPosition + Vector3.up + Vector3.forward);                  // + 2
+            waterVertexList.Add(currentPosition + Vector3.up + Vector3.right + Vector3.forward);  // + 3
+            
+            AddFaceNormals(Vector3.up, true);
+            AddTriangles(waterSize, true);
+            AddUVs(blockByte, Sides.Top, true);
+            
+            return;
+        }
+        
         int size = vertexList.Count;
         vertexList.Add(currentPosition + Vector3.up);                                    // + 0
         vertexList.Add(currentPosition + Vector3.up + Vector3.right);                    // + 1
@@ -245,13 +334,18 @@ public class ChunkMesh : MonoBehaviour
         AddUVs(blockByte, Sides.Top);
     }
 
-    protected void HandleBottom(ref byte blockByte, ref byte bottomBlockByte, ref Vector3 currentPosition)
+    private void HandleBottom(ref byte blockByte, ref byte bottomBlockByte, ref Vector3 currentPosition)
     {
         Block block = VoxelHandler.instance.blockData[((Blocks)blockByte).ToString()];
         Block bottomBlock = VoxelHandler.instance.blockData[((Blocks)bottomBlockByte).ToString()];
 
         bool isVisible = false;
 
+        if (blockByte == (byte) Blocks.Water)
+        {
+            return;
+        }
+        
         if (!block.transparant && bottomBlock.transparant)
         {
             isVisible = true;
@@ -277,13 +371,18 @@ public class ChunkMesh : MonoBehaviour
         AddUVs(blockByte, Sides.Bottom);
     }
 
-    protected void HandleBack(ref byte blockByte, ref byte backBlockByte, ref Vector3 currentPosition)
+    private void HandleBack(ref byte blockByte, ref byte backBlockByte, ref Vector3 currentPosition)
     {
         Block block = VoxelHandler.instance.blockData[((Blocks)blockByte).ToString()];
         Block backBlock = VoxelHandler.instance.blockData[((Blocks)backBlockByte).ToString()];
 
         bool isVisible = false;
 
+        if (blockByte == (byte) Blocks.Water)
+        {
+            return;
+        }
+        
         if (!block.transparant && backBlock.transparant)
         {
             isVisible = true;
@@ -309,13 +408,18 @@ public class ChunkMesh : MonoBehaviour
         AddUVs(blockByte, Sides.Back);
     }
 
-    protected void HandleFront(ref byte blockByte, ref byte frontBlockByte, ref Vector3 currentPosition)
+    private void HandleFront(ref byte blockByte, ref byte frontBlockByte, ref Vector3 currentPosition)
     {
         Block block = VoxelHandler.instance.blockData[((Blocks)blockByte).ToString()];
         Block frontBlock = VoxelHandler.instance.blockData[((Blocks)frontBlockByte).ToString()];
 
         bool isVisible = false;
 
+        if (blockByte == (byte) Blocks.Water)
+        {
+            return;
+        }
+        
         if (!block.transparant && frontBlock.transparant)
         {
             isVisible = true;

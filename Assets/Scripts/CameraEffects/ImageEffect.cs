@@ -8,6 +8,7 @@ public class ImageEffect : MonoBehaviour
 
     public void OnRenderImage(RenderTexture src, RenderTexture dst)
     {
+        if (_effect == null) return;
         Graphics.Blit(src, dst, _effect);
     }
 }
