@@ -186,6 +186,21 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _effect: {fileID: 2100000, guid: 609135b918e81d44281b6cfe32526905, type: 2}
+--- !u!114 &266037286
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 266037282}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 99d1b7e8b514bfa4ba4587b80c256314, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  underwaterMaterial: {fileID: 2100000, guid: 609135b918e81d44281b6cfe32526905, type: 2}
+  startTransition: 12.5
+  endTransition: 11.5
 --- !u!20 &495110359 stripped
 Camera:
   m_CorrespondingSourceObject: {fileID: 2254821104361148016, guid: ca47636eb1de11a49ad0385e74923fde,
