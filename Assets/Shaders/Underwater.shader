@@ -52,6 +52,16 @@
                 col.b *= 1.2;
                 return saturate(col);
             }
+            
+            float4 chromaticAberration (sampler2D tex, float2 uv, float amount) 
+            {
+                return fixed4(
+                    tex2D(tex, uv + fixed2(-amount, 0)).r,
+                    tex2D(tex, uv).g,
+                    tex2D(tex, uv + fixed2(amount, 0)).b,
+                    tex2D(tex, uv).a
+                );
+            }
 
             sampler2D _MainTex;
             float _ApplyPercentage;
@@ -67,14 +77,9 @@
 
             fixed4 frag (v2f i) : SV_Target
             {
+                // Chromatic Aberration
                 if (i.uv.y > _ApplyPercentage) {
-                    float r = tex2D(_MainTex, i.uv + fixed2(-_ChromaticAb, 0)).r;
-                    float g = tex2D(_MainTex, i.uv).g;
-                    float b = tex2D(_MainTex, i.uv + fixed2(_ChromaticAb, 0)).b;
-                    float a = tex2D(_MainTex, i.uv).a;
-                    
-                    return fixed4(r, g, b, a);
-                    return tex2D(_MainTex, i.uv);
+                    return chromaticAberration(_MainTex, i.uv, _ChromaticAb);
                 }
                 
                 float2 distortion = tex2D(_DistortTex, i.uv + _Time[1] / 10).xy;
