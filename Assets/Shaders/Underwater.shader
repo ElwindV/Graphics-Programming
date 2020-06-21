@@ -62,6 +62,14 @@
                     tex2D(tex, uv).a
                 );
             }
+            
+            float getDepth (sampler2D tex, float4 screenPos, float dist)
+            {
+                float depth = tex2Dproj(tex, screenPos).r;
+                float linearDepth = LinearEyeDepth(depth);
+                float depthDiff = (linearDepth - screenPos.w) / dist;
+                return saturate(depthDiff);
+            }
 
             sampler2D _MainTex;
             float _ApplyPercentage;
@@ -77,24 +85,29 @@
 
             fixed4 frag (v2f i) : SV_Target
             {
-                // Chromatic Aberration
                 if (i.uv.y > _ApplyPercentage) {
-                    return chromaticAberration(_MainTex, i.uv, _ChromaticAb);
+                    // float3 lightDirection = normalize(_WorldSpaceLightPos0.xyz);
+                    // float3 viewDir = mul((float3x3)unity_CameraToWorld, float3(0,0,1));
+                    
+                    // float light = dot(lightDirection, viewDir);
+                    // light += 1.0;
+                    // light /= 2.0;
+                    
+                    // if (light > 0.8) return 1;
+                    
+                    float4 col = chromaticAberration(_MainTex, i.uv, _ChromaticAb);
+                    return col;
                 }
                 
                 float2 distortion = tex2D(_DistortTex, i.uv + _Time[1] / 10).xy;
                 distortion = ((distortion * 2) - 1) * _DistortAmount;
                 
                 i.screenPos.xy += distortion;
-                float depth = tex2Dproj(_CameraDepthTexture, i.screenPos).r;
-                float linearDepth = LinearEyeDepth(depth);
-                float depthDiff = (linearDepth - i.screenPos.w) / _Distance;
-                depthDiff = saturate(depthDiff);
+                float depth = getDepth(_CameraDepthTexture, i.screenPos, _Distance);
                 
                 fixed4 col = tex2D(_MainTex, i.uv + distortion);
                 
-                col = lerp(col, _DarkWater, depthDiff);
-                
+                col = lerp(col, _DarkWater, depth);
                 col = shiftToBlue(col);
                 
                 return col;
