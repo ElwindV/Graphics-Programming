@@ -70,13 +70,14 @@
                 
                 float2 distortion = tex2D(_DistortTex, i.uv + _Time[1] / 10).xy;
                 distortion = ((distortion * 2) - 1) * _DistortAmount;
-                            
-                fixed4 col = tex2D(_MainTex, i.uv + distortion);
                 
+                i.screenPos.xy += distortion;
                 float depth = tex2Dproj(_CameraDepthTexture, i.screenPos).r;
                 float linearDepth = LinearEyeDepth(depth);
                 float depthDiff = (linearDepth - i.screenPos.w) / _Distance;
                 depthDiff = saturate(depthDiff);
+                
+                fixed4 col = tex2D(_MainTex, i.uv + distortion);
                 
                 col = lerp(col, _DarkWater, depthDiff);
                 
