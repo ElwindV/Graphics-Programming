@@ -92,9 +92,15 @@
                     // float light = dot(lightDirection, viewDir);
                     // light += 1.0;
                     // light /= 2.0;
-                    
-                    // if (light > 0.8) return 1;
-                    
+
+                    // float4 projected = mul()
+
+                    // float depth = getDepth(_CameraDepthTexture, i.screenPos, 100);
+
+                    // if (light > 0.9 && depth > 0.999) {
+                    //     return 1;
+                    // }
+
                     float4 col = chromaticAberration(_MainTex, i.uv, _ChromaticAb);
                     return col;
                 }

@@ -59,10 +59,10 @@ public class ChunkMesh : MonoBehaviour
         chunk = this.gameObject.GetComponent<Chunk>();
 
         material = Resources.Load<Material>("Materials/Voxel");
-        meshRenderer.material = this.material;
+        meshRenderer.sharedMaterial = this.material;
         
         waterMaterial = Resources.Load<Material>("Materials/Water");
-        waterMeshRenderer.material = this.waterMaterial;
+        waterMeshRenderer.sharedMaterial = this.waterMaterial;
 
         leftChunk = (chunk.x - 1 >= 0)
             ? VoxelHandler.instance.chunks[chunk.x - 1, chunk.z].GetComponent<Chunk>()
